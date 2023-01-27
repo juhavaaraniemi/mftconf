@@ -1,7 +1,7 @@
 -- mftconf example
 
 package.loaded["mftconf/lib/mftconf"] = nil
-mftconf = require('mftconf/lib/mftconf')
+mftconf = require("mftconf/lib/mftconf")
 PATH = _path.data.."mft_config/"
 
 function init()
@@ -10,7 +10,7 @@ end
 
 function key(n,z)
   if z == 1 and n == 2 then
-    mftconf.load_conf(mft,PATH.."mft_molly.mfs")
+    mftconf.load_conf(mft,PATH.."mft_passersby.mfs")
   end
 end
 
