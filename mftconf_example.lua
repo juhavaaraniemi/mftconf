@@ -1,27 +1,25 @@
--- mftconf example
+-- mftconf lib example
 
-package.loaded["mftconf/lib/mftconf"] = nil
+-- require mftconf library
 mftconf = require("mftconf/lib/mftconf")
-PATH = _path.data.."mft_config/"
 
 function init()
-  mft = midi.connect(2)
-end
-
-function key(n,z)
-  if z == 1 and n == 2 then
-    mftconf.load_conf(mft,PATH.."mft_passersby.mfs")
-  end
+  -- connect your midi fighter twister in your script:
+  -- mft = midi.connect(your_midi_figther_twister)
+  
+  -- call this function to load midi fighter twister configuration file
+  -- params: midi device, config file with path:
+  -- mftconf.load_conf(mft,"PATH/mft_config_file.mfs")
+  
+  redraw()
 end
 
 function redraw()
   screen.clear()
   screen.level(15)
   screen.move(0,11)
-  screen.text("give midi device &")
+  screen.text("check source code")
   screen.move(0,18)
-  screen.text("filename as params")
-  screen.move(0,32)
-  screen.text("press k2 to load config")
+  screen.text("for instructions")
   screen.update()
 end
