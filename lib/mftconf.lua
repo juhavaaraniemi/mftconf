@@ -188,12 +188,12 @@ function mftconf.load_conf(midi_dev,filename)
   parse_mft_conf(read_file(filename))
   for i=1,64 do
     build_enc_sysex_packet(i)
-    send_sysex(mft,packet1)
-    send_sysex(mft,packet2)
+    send_sysex(midi_dev,packet1)
+    send_sysex(midi_dev,packet2)
   end
   print("encoder conf pushed")
   build_global_sysex_packet()
-  send_sysex(mft,packet0)
+  send_sysex(midi_dev,packet0)
   print("global conf pushed")
 end
 
