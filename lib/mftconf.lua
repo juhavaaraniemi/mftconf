@@ -74,19 +74,19 @@ end
 -- CONFIG PARSE
 --
 local function parse_mft_conf(sysex_table)
-  local cur_bit = ""
-  local prev1_bit = ""
-  local prev2_bit = ""
-  local prev3_bit = ""
+  local cur_byte = ""
+  local prev1_byte = ""
+  local prev2_byte = ""
+  local prev3_byte = ""
   local enc = 1
   
   for i,v in ipairs(sysex_table) do
-    cur_bit = sysex_table[i]
-    if cur_bit == "0x36" and prev1_bit == "0x00" and prev2_bit == ""  then
+    cur_byte = sysex_table[i]
+    if cur_byte == "0x36" and prev1_byte == "0x00" and prev2_byte == ""  then
       table.remove(sysex_table,i)
       table.remove(sysex_table,i-1)
       table.insert(sysex_table,i-1,"global")      
-    elseif cur_bit == "0x00" and prev1_bit == "0x01" and prev2_bit == ("0x"..string.format("%02X",enc)) and prev3_bit == "0x00" then
+    elseif cur_byte == "0x00" and prev1_byte == "0x01" and prev2_byte == ("0x"..string.format("%02X",enc)) and prev3_byte == "0x00" then
       table.remove(sysex_table,i)
       table.remove(sysex_table,i-1)
       table.remove(sysex_table,i-2)
@@ -95,22 +95,22 @@ local function parse_mft_conf(sysex_table)
       table.remove(sysex_table,i-2)
       enc = enc + 1
     end
-    prev3_bit = prev2_bit
-    prev2_bit = prev1_bit
-    prev1_bit = cur_bit
+    prev3_byte = prev2_byte
+    prev2_byte = prev1_byte
+    prev1_byte = cur_byte
   end
 
   local id = 1 --id 0 for global settings, 1-64 for encoder settings
   
   for i,v in ipairs(sysex_table) do
-    cur_bit = sysex_table[i]
-    if cur_bit == "global" then
+    cur_byte = sysex_table[i]
+    if cur_byte == "global" then
       conf[0] = {}
-    elseif cur_bit == "encoder" then
+    elseif cur_byte == "encoder" then
       conf[id] = {}
       id = id + 1
     else
-      table.insert(conf[id-1],cur_bit)
+      table.insert(conf[id-1],cur_byte)
     end
   end
 end
