@@ -1,5 +1,6 @@
 -- midi fighter twister
 -- config loader lib
+-- v0.1 @JulesV
 
 -- SYSEX BYTES FOR ENCODERS
 -- 0x00   start byte
