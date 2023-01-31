@@ -66,7 +66,7 @@ local function read_file(filename)
       table.insert(hex_table,hex)
     end
   end
-  print(filename.." read succesfully!")
+  print(filename.." midi fighter twister conf file read succesfully!")
   return hex_table
 end
 
@@ -230,7 +230,6 @@ local function read_midi_mappings()
     return s:gsub('^"', ''):gsub('"$', ''):gsub('\\"', '"')
   end
   local filename = norns.state.data..norns.state.shortname..".pmap"
-  print(">> reading PMAP "..filename.." to initialize midi controller")
   local fd = io.open(filename, "r")
   if fd then
     io.close(fd)
@@ -252,6 +251,7 @@ local function read_midi_mappings()
         end
       end
     end
+    print(filename.." midi mapping file read succesfully!")
   else
     print("m.read: "..filename.." not read, using defaults.")
   end
