@@ -1,6 +1,6 @@
 -- midi fighter twister
 -- config loader lib
--- v0.1 @JulesV
+-- v0.2 @JulesV
 
 -- SYSEX BYTES FOR ENCODERS
 -- 0x00   start byte
@@ -197,5 +197,99 @@ function mftconf.load_conf(midi_dev,filename)
   send_sysex(midi_dev,packet0)
   print("global conf pushed")
 end
+
+
+--
+-- READ PARAMS FROM HOST SCRIPT
+--
+local param_values = {}
+local function read_param_values()
+  for i=1,params.count do
+    local p = params:lookup_param(i)
+    param_values[p.id] = {}
+    if p.t == 3 then
+      param_values[p.id].value = p.controlspec:unmap(params:get(p.id))
+      param_values[p.id].min = 0
+      param_values[p.id].max = 1
+      param_values[p.id].cc_value = util.round(util.linlin(param_values[p.id].min,param_values[p.id].max,0,127,param_values[p.id].value))
+    elseif p.t == 1 or p.t == 2 then
+      param_values[p.id].value = params:get(p.id)
+      param_values[p.id].min = params:get_range(p.id)[1]
+      param_values[p.id].max = params:get_range(p.id)[2]
+      param_values[p.id].cc_value = util.round(util.linlin(param_values[p.id].min,param_values[p.id].max,0,127,param_values[p.id].value))
+    end
+  end
+end
+
+
+--
+-- READ MIDI MAPPINGS FROM HOST SCRIPT
+--
+local function read_midi_mappings()
+  local function unquote(s)
+    return s:gsub('^"', ''):gsub('"$', ''):gsub('\\"', '"')
+  end
+  local filename = norns.state.data..norns.state.shortname..".pmap"
+  print(">> reading PMAP "..filename.." to initialize midi controller")
+  local fd = io.open(filename, "r")
+  if fd then
+    io.close(fd)
+    for line in io.lines(filename) do
+      local name, value = string.match(line, "(\".-\")%s*:%s*(.*)")
+      if name and value and tonumber(value)==nil then
+        local param_id = unquote(name)
+        local s = unquote(value)
+        local s = string.gsub(s,"{","")
+        local s = string.gsub(s,"}","")
+        for key, val in string.gmatch(s, "(%S-)=(%d+)") do
+          if key == "dev" then
+            param_values[param_id].dev = val
+          elseif key == "ch" then
+            param_values[param_id].ch = val
+          elseif key == "cc" then
+            param_values[param_id].cc = val
+          end
+        end
+      end
+    end
+  else
+    print("m.read: "..filename.." not read, using defaults.")
+  end
+end
+
+
+--
+-- CLEAR MFT CC VALUES
+--
+local function clear_values(midi_dev)
+  for i=0,127 do
+    midi_dev:cc(i, 0, 1)
+  end
+end
+
+
+--
+-- SEND MAPPED PARAM VALUES TO MFT
+--
+local function send_values(midi_dev)
+  for i=1,params.count do
+    local p = params:lookup_param(i)
+    midi_dev:cc(param_values[p.id].cc, param_values[p.id].cc_value, param_values[p.id].ch)
+  end
+end
+
+
+--
+-- EXEC FUNCTION
+--
+
+function mftconf.refresh_values(midi_dev)
+  read_param_values()
+  read_midi_mappings()
+  clear_values(midi_dev)
+  send_values(midi_dev)
+  print("param values pushed")
+end
+  
 
 return mftconf
