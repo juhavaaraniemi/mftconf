@@ -1,6 +1,6 @@
 -- midi fighter twister
 -- config loader lib
--- v0.2 @JulesV
+-- v0.3 @JulesV
 
 -- SYSEX BYTES FOR ENCODERS
 -- 0x00   start byte
@@ -203,10 +203,17 @@ end
 -- READ PARAMS FROM HOST SCRIPT
 --
 local param_values = {}
-local function read_param_values()
+
+local function init_param_values()
   for i=1,params.count do
     local p = params:lookup_param(i)
     param_values[p.id] = {}
+  end
+end
+  
+local function read_param_values()
+  for i=1,params.count do
+    local p = params:lookup_param(i)
     if p.t == 3 then
       param_values[p.id].value = p.controlspec:unmap(params:get(p.id))
       param_values[p.id].min = 0
@@ -274,7 +281,9 @@ end
 local function send_values(midi_dev)
   for i=1,params.count do
     local p = params:lookup_param(i)
-    midi_dev:cc(param_values[p.id].cc, param_values[p.id].cc_value, param_values[p.id].ch)
+    if param_values[p.id].cc ~= nil then
+      midi_dev:cc(param_values[p.id].cc, param_values[p.id].cc_value, param_values[p.id].ch)
+    end
   end
 end
 
@@ -282,14 +291,20 @@ end
 --
 -- EXEC FUNCTION
 --
-
 function mftconf.refresh_values(midi_dev)
+  init_param_values()
   read_param_values()
   read_midi_mappings()
   clear_values(midi_dev)
   send_values(midi_dev)
   print("param values pushed")
 end
-  
+
+function mftconf.mft_redraw(midi_dev,param_id)
+  read_param_values()
+  if param_values[param_id].cc ~= nil then
+    midi_dev:cc(param_values[param_id].cc, param_values[param_id].cc_value, param_values[param_id].ch)
+  end
+end
 
 return mftconf
