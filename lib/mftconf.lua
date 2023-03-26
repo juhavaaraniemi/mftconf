@@ -1,6 +1,6 @@
 -- midi fighter twister
 -- config loader lib
--- v0.3 @JulesV
+-- v0.4 @JulesV
 
 -- SYSEX BYTES FOR ENCODERS
 -- 0x00   start byte
@@ -216,6 +216,11 @@ local function read_param_values()
     local p = params:lookup_param(i)
     if p.t == 3 then
       param_values[p.id].value = p.controlspec:unmap(params:get(p.id))
+      param_values[p.id].min = 0
+      param_values[p.id].max = 1
+      param_values[p.id].cc_value = util.round(util.linlin(param_values[p.id].min,param_values[p.id].max,0,127,param_values[p.id].value))
+    elseif p.t == 5 then
+      param_values[p.id].value = params:get_raw(p.id)
       param_values[p.id].min = 0
       param_values[p.id].max = 1
       param_values[p.id].cc_value = util.round(util.linlin(param_values[p.id].min,param_values[p.id].max,0,127,param_values[p.id].value))
