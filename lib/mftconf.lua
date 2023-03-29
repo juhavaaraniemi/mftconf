@@ -208,23 +208,27 @@ local function init_param_values()
   for i=1,params.count do
     local p = params:lookup_param(i)
     param_values[p.id] = {}
+    param_values[p.id].t = p.t
+    if p.t == 3 or p.t == 5 then
+      param_values[p.id].min = 0
+      param_values[p.id].max = 1
+    elseif p.t == 1 or p.t == 2 or p.t == 9 then
+      param_values[p.id].min = params:get_range(p.id)[1]
+      param_values[p.id].max = params:get_range(p.id)[2]
+    end
   end
 end
-  
+
 local function read_param_values()
   for i=1,params.count do
     local p = params:lookup_param(i)
     if p.t == 3 or p.t == 5 then
       param_values[p.id].value = params:get_raw(p.id)
-      param_values[p.id].min = 0
-      param_values[p.id].max = 1
       param_values[p.id].cc_value = util.round(util.linlin(param_values[p.id].min,param_values[p.id].max,0,127,param_values[p.id].value))
     elseif p.t == 1 or p.t == 2 or p.t == 9 then
       param_values[p.id].value = params:get(p.id)
-      param_values[p.id].min = params:get_range(p.id)[1]
-      param_values[p.id].max = params:get_range(p.id)[2]
       param_values[p.id].cc_value = util.round(util.linlin(param_values[p.id].min,param_values[p.id].max,0,127,param_values[p.id].value))
-    end
+    end  
   end
 end
 
@@ -301,7 +305,13 @@ function mftconf.refresh_values(midi_dev)
 end
 
 function mftconf.mft_redraw(midi_dev,param_id)
-  read_param_values()
+  if param_values[param_id].t == 3 or param_values[param_id].t == 5 then
+    param_values[param_id].value = params:get_raw(param_id)
+    param_values[param_id].cc_value = util.round(util.linlin(param_values[param_id].min,param_values[param_id].max,0,127,param_values[param_id].value))
+  elseif param_values[param_id].t == 1 or param_values[param_id].t == 2 or param_values[param_id].t == 9 then
+    param_values[param_id].value = params:get(param_id)
+    param_values[param_id].cc_value = util.round(util.linlin(param_values[param_id].min,param_values[param_id].max,0,127,param_values[param_id].value))
+  end
   if param_values[param_id].cc ~= nil then
     midi_dev:cc(param_values[param_id].cc, param_values[param_id].cc_value, param_values[param_id].ch)
   end
