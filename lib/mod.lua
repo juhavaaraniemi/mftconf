@@ -36,13 +36,13 @@ end
 m.redraw = function()
   screen.clear()
   screen.move(5,10)
-  screen.text("device: ")
+  screen.text("mft conf file:")
   screen.move(5,20)
-  screen.text(selected_device)
-  screen.move(5,40)
-  screen.text("conf file: ")
-  screen.move(5,50)
   screen.text(selected_file)
+  screen.move(5,40)
+  screen.text("e3 to select file")
+  screen.move(5,50)
+  screen.text("k3 to load conf")
   screen.update()
 end
 
