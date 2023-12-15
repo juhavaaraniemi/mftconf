@@ -58,6 +58,9 @@ m.init = function()
   
   -- read conf files
   conf_files = util.scandir(PATH)
+
+  -- create data directory if it does not exist
+  if not util.file_exists(PATH) then util.make_dir(PATH) end
 end
 
 m.deinit = function() end
