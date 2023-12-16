@@ -47,6 +47,7 @@ m.redraw = function()
 end
 
 m.init = function()
+
   -- read midi devices
   for i = 1,#midi.vports do -- query all ports
     midi_device[i] = midi.connect(i) -- connect each device
@@ -55,12 +56,12 @@ m.init = function()
       device_index = i
     end
   end
-  
-  -- read conf files
-  conf_files = util.scandir(PATH)
 
   -- create data directory if it does not exist
   if not util.file_exists(PATH) then util.make_dir(PATH) end
+  
+  -- read conf files
+  conf_files = util.scandir(PATH)
 end
 
 m.deinit = function() end
